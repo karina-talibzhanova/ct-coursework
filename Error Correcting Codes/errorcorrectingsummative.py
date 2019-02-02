@@ -1,9 +1,9 @@
 import numpy as np
 
+
 # function HammingG
 # input: a number r
 # output: G, the generator matrix of the (2^r-1,2^r-r-1) Hamming code
-
 def hammingGeneratorMatrix(r):
     n = 2 ** r - 1
 
@@ -41,7 +41,6 @@ def hammingGeneratorMatrix(r):
     return G
 
 
-
 # function decimalToVector
 # input: numbers n and r (0 <= n<2**r)
 # output: a string v of r bits representing n
@@ -52,17 +51,16 @@ def decimalToVector(n, r):
         n //= 2
     return v
 
-
 # question 1
 
-# question 2
 
+# question 2
 def hammingEncoder(m):
     r = 2
     while True:
         if 2**r - r - 1 == len(m):
             break
-        elif r > len(m):
+        elif 2**r - r - 1 > len(m):
             return []
         r += 1
 
@@ -77,20 +75,52 @@ def hammingEncoder(m):
 
     return encoded_ls
 
+
 # question 3
+def hammingDecoder(v):
+    r = 2
+    while True:
+        if 2**r - 1 == len(v):
+            break
+        elif 2**r - 1 > len(v):
+            return []
+        r += 1
+
+    hamming = np.zeros((r, 2**r - 1), dtype=np.int)
+
+    for i in range(hamming.shape[1]):
+        hamming[:, i] = decimalToVector(i + 1, r)
+
+    syndrome = np.matmul(v, hamming.transpose())
+
+    syndrome_ls = []
+
+    for i in syndrome:
+        syndrome_ls.append(str(i % 2))
+
+    index = int(''.join(syndrome_ls), 2) - 1
+
+    if index < 0:
+        return v
+    else:
+        if v[index] == 0:
+            v[index] = 1
+        else:
+            v[index] = 0
+
+    return v
+
 
 # question 4
 
 # question 5
 
 # question 6
-
 def repetitionEncoder(m, n):
     return m*n
 
 
 # question 7
-
 def repetitionDecoder(v):
 
     if v.count(1) > len(v)//2:
