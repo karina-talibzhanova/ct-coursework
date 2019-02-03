@@ -112,6 +112,21 @@ def hammingDecoder(v):
 
 
 # question 4
+def messageFromCodeword(c):
+    r = 2
+    while True:
+        if 2**r - 1 == len(c):
+            break
+        elif 2**r - 1 > len(c):
+            return []
+        r += 1
+
+    indices = [2 ** i - 1 for i in range(r)]
+
+    c = [val for index, val in enumerate(c) if index not in indices]
+
+    return c
+
 
 # question 5
 
