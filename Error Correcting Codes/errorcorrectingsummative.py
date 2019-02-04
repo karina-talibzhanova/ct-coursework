@@ -148,6 +148,26 @@ def messageFromCodeword(c):
 
 
 # question 5
+def dataFromMessage(m):
+    r = 2
+    while True:
+        if 2**r - r - 1 == len(m):
+            break
+        elif 2**r - r - 1 > len(m):
+            return []
+        r += 1
+
+    l = int(''.join(str(i) for i in m[:r]), 2)
+    if l > len(m) - r:
+        return []
+    a = m[r:r + l]
+    z = m[r + l:]
+    for j in z:
+        if j != 0:
+            return []
+
+    return a
+
 
 # question 6
 def repetitionEncoder(m, n):
