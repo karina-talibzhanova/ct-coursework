@@ -51,7 +51,26 @@ def decimalToVector(n, r):
         n //= 2
     return v
 
+
 # question 1
+def message(a):
+    r = 2
+    while True:
+        if 2**r - 2*r - 1 >= len(a):
+            break
+        else:
+            r += 1
+
+    m = []
+
+    k = 2**r - r - 1
+    l = decimalToVector(len(a), r)
+    a = decimalToVector(int(''.join(str(i) for i in a), 2), len(a))
+    z = decimalToVector(0, k - (len(a) + r))
+
+    m.extend(l+a+z)
+
+    return m
 
 
 # question 2
