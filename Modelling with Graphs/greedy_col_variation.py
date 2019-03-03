@@ -11,18 +11,15 @@ import graph5
 def find_next_vertex(G, next):
 	global vertices
 
-	print("find next vertex")
-
-	if len(vertices) == 0:
-		print("we got here bois")
-		return -1
-
 	for i in nx.neighbors(G, next):
 		if G.node[i]["visited"] == "no":
 			vertices.add(i)
 
 	vertices.remove(next)
-	print(vertices)
+
+	if len(vertices) == 0:
+		return -1
+
 	return min(vertices)
 
 
@@ -49,23 +46,16 @@ def greedy(G):
 	global vertices
 
 	nx.set_node_attributes(G, 0, "color")
-	visit = nx.get_node_attributes(G, "visited")
 
 	vertices = {1}
 
-	# next = list(G.nodes)[0]
 	next = 1
-	# print(next)
 
 	# colour the graph while some nodes remain unvisited
 	while "no" in nx.get_node_attributes(G, "visited").values():
 		find_smallest_color(G, next)
 		G.node[next]["visited"] = "yes"
 		next = find_next_vertex(G, next)
-		# vertices.remove(next)
-		print("while loop")
-		print(next)
-		print(nx.get_node_attributes(G, "visited").values())
 
 	color_vals = list(nx.get_node_attributes(G, "color").values())
 	kmax = max(color_vals)
