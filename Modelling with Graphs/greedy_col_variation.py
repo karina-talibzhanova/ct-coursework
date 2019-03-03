@@ -6,16 +6,24 @@ import graph4
 import graph5
 
 
-def find_next_vertex(G, i):
+# original function didn't have param i
+# there should be a way to do it with just the one parameter
+def find_next_vertex(G, next):
+	global vertices
 
-	# have a node, find its neighbours, visit the neighbour with the smallest label
-	# but i'm not given a node to examine in this function..... although i could modify it
-	# need to mark which nodes have been visited <-- this requires an attribute alongside color
+	print("find next vertex")
 
-	for j in nx.neighbors(G, i):
-		if G.node[j]["visited"] == "no":
-			G.node[j]["visited"] = "yes"
-			return j
+	if len(vertices) == 0:
+		print("we got here bois")
+		return -1
+
+	for i in nx.neighbors(G, next):
+		if G.node[i]["visited"] == "no":
+			vertices.add(i)
+
+	vertices.remove(next)
+	print(vertices)
+	return min(vertices)
 
 
 def find_smallest_color(G, i):
@@ -35,29 +43,32 @@ def find_smallest_color(G, i):
 	G.node[i]["color"] = current
 
 
-
-
-
-
 def greedy(G):
 	global kmax
 	global visited_counter
+	global vertices
 
 	nx.set_node_attributes(G, 0, "color")
+	visit = nx.get_node_attributes(G, "visited")
 
+	vertices = {1}
+
+	# next = list(G.nodes)[0]
 	next = 1
+	# print(next)
 
-	while "no" in G.nodes.data("visited").values():
+	# colour the graph while some nodes remain unvisited
+	while "no" in nx.get_node_attributes(G, "visited").values():
 		find_smallest_color(G, next)
+		G.node[next]["visited"] = "yes"
 		next = find_next_vertex(G, next)
+		# vertices.remove(next)
+		print("while loop")
+		print(next)
+		print(nx.get_node_attributes(G, "visited").values())
 
-
-
-
-
-
-
-
+	color_vals = list(nx.get_node_attributes(G, "color").values())
+	kmax = max(color_vals)
 
 	print()
 	for i in G.nodes():
