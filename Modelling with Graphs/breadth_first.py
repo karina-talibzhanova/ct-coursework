@@ -10,15 +10,6 @@ def bfs(G,a,b):
 	G.add_nodes_from(G.nodes(), label=-1)  # initialization of all labels
 	G.node[a]["label"] = 0
 
-	# i = 0
-	# label[a] = 0
-	# while b is unlabeled
-	# 	for each vertex u with label[u] == i:
-	# 		for each unlabeled vertex v in Adj[u]
-	# 		label[v] = i + 1
-	# 	i += 1
-	# return label[b]
-
 	i = 0
 
 	while G.node[b]["label"] == -1:

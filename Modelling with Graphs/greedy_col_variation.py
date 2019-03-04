@@ -6,17 +6,18 @@ import graph4
 import graph5
 
 
-# original function didn't have param i
-# there should be a way to do it with just the one parameter
 def find_next_vertex(G, next):
 	global vertices
 
+	# add all unvisited neighbours of current node
 	for i in nx.neighbors(G, next):
 		if G.node[i]["visited"] == "no":
 			vertices.add(i)
 
+	# remove current node as it has been visited
 	vertices.remove(next)
 
+	# if the current node was the only one left in the set, then all nodes have been visited
 	if len(vertices) == 0:
 		return -1
 
@@ -66,7 +67,6 @@ def greedy(G):
 	print()
 	print('The number of colors that Greedy computed is:', kmax)
 	print()
-
 
 
 print('Graph G1:')

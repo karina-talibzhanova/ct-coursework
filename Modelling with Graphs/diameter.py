@@ -7,29 +7,34 @@ import graph9
 import graph10
 
 
+def bfs(G,a,b):
+	G.add_nodes_from(G.nodes(), label=-1)  # initialization of all labels
+	G.node[a]["label"] = 0
+
+	i = 0
+
+	while G.node[b]["label"] == -1:
+		for u in G.nodes:
+			if G.node[u]["label"] == i:
+				for v in nx.neighbors(G, u):
+					if G.node[v]["label"] == -1:
+						G.node[v]["label"] = i + 1
+		i += 1
+
+	return G.node[b]["label"]
+
+
 def max_distance(G):
 
+	current_max = -1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	# comparing each pair of nodes and finding the max distance
+	for u in G.nodes:
+		for v in G.nodes:
+			found = bfs(G, u, v)
+			if found > current_max:
+				current_max = found
+	return current_max
 
 print()
 G6=graph6.Graph()
