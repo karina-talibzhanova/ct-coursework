@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import time
-import sys
+# import time
+# import sys
 import numpy as np
 
 
@@ -32,13 +32,13 @@ def displayAlignment(alignment):
 
 # DO NOT EDIT ------------------------------------------------
 # This opens the files, loads the sequences and starts the timer
-file1 = open(sys.argv[1], 'r')
-seq1=file1.read()
-file1.close()
-file2 = open(sys.argv[2], 'r')
-seq2=file2.read()
-file2.close()
-start = time.time()
+# file1 = open(sys.argv[1], 'r')
+# seq1=file1.read()
+# file1.close()
+# file2 = open(sys.argv[2], 'r')
+# seq2=file2.read()
+# file2.close()
+# start = time.time()
 
 # -------------------------------------------------------------
 
@@ -59,17 +59,48 @@ start = time.time()
 
 # (rows, columns)
 
+seq1 = "AATG"
+seq2 = "ACGT"
+
+
 scoring_matrix = np.zeros((len(seq1) + 1, len(seq2) + 1), dtype=int)  # remember to include the gaps
 backtrack_matrix = np.full((len(seq1) + 1, len(seq2) + 1), "-", dtype=str)
 
 # these loops initialise the first row and column of the scoring + backtrack matrix when matching against gaps
+# i.e. the whole pattern of -2, -4, -6, etc.
 for i in range(1, len(seq2) + 1):
     scoring_matrix[0, i] = scoring_matrix[0, i-1] - 2
     backtrack_matrix[0, i] = "L"
 
-for j in range(1, len(seq2) + 1):
+for j in range(1, len(seq1) + 1):
     scoring_matrix[j, 0] = scoring_matrix[j-1, 0] - 2
     backtrack_matrix[j, 0] = "U"
+
+# the actual process of filling in the scoring matrix
+# going row by row
+for row in range(1, len(seq1) + 1):
+        for column in range(1, len(seq2) + 1):
+            # need to compare bases
+            # where i am in the matrix is where i need to look in the string to compare bases
+            if seq1[row-1] != seq2[column-1]:
+                diagonal = scoring_matrix[row-1, column-1] - 3
+            else:
+                if seq1[row-1] == "A":
+                    diagonal = scoring_matrix[row-1, column-1] + 4
+                elif seq1[row-1] == "C":
+                    diagonal = scoring_matrix[row-1, column-1] + 3
+                elif seq1[row-1] == "G":
+                    diagonal = scoring_matrix[row-1, column-1] + 2
+                else:
+                    diagonal = scoring_matrix[row-1, column-1] + 1
+
+            up = scoring_matrix[row - 1, column] - 2
+            left = scoring_matrix[row, column-1] - 2
+            scoring_matrix[row, column] = max(diagonal, up, left)
+
+
+print(scoring_matrix)
+
 
 
 # score = max(bases, base against gap, gap against base)
@@ -79,12 +110,12 @@ for j in range(1, len(seq2) + 1):
 
 # DO NOT EDIT (unless you want to turn off displaying alignments for large sequences)------------------
 # This calculates the time taken and will print out useful information 
-stop = time.time()
-time_taken=stop-start
-
-# Print out the best
-print('Time taken: '+str(time_taken))
-print('Best (score '+str(best_score)+'):')
-displayAlignment(best_alignment)
+# stop = time.time()
+# time_taken=stop-start
+#
+# # Print out the best
+# print('Time taken: '+str(time_taken))
+# print('Best (score '+str(best_score)+'):')
+# displayAlignment(best_alignment)
 
 # -------------------------------------------------------------
