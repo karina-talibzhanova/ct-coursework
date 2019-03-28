@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# import time
-# import sys
+import time
+import sys
 import numpy as np
 
 
@@ -62,6 +62,8 @@ def displayAlignment(alignment):
 seq1 = "AATG"
 seq2 = "ACGT"
 
+start = time.time()
+
 
 scoring_matrix = np.zeros((len(seq1) + 1, len(seq2) + 1), dtype=int)  # remember to include the gaps
 backtrack_matrix = np.full((len(seq1) + 1, len(seq2) + 1), "-", dtype=str)
@@ -75,6 +77,8 @@ for i in range(1, len(seq2) + 1):
 for j in range(1, len(seq1) + 1):
     scoring_matrix[j, 0] = scoring_matrix[j-1, 0] - 2
     backtrack_matrix[j, 0] = "U"
+
+direction = ("D", "U", "L")
 
 # the actual process of filling in the scoring matrix
 # going row by row
@@ -96,26 +100,51 @@ for row in range(1, len(seq1) + 1):
 
             up = scoring_matrix[row - 1, column] - 2
             left = scoring_matrix[row, column-1] - 2
-            scoring_matrix[row, column] = max(diagonal, up, left)
+            scores = (diagonal, up, left)
+            scoring_matrix[row, column] = max(scores)
+            backtrack_matrix[row, column] = direction[scores.index(max(scores))]
 
+# need to find the optimal alignment now
+# start in bottom right of backtracking matrix and follow the directions
+# diagonal - match/mismatch
+# up - letter on the side (seq1) against a gap
+# left - letter on the top (seq2) against a gap
 
-print(scoring_matrix)
+row = len(seq1)
+column = len(seq2)
+alignment1 = []
+alignment2 = []
 
+while backtrack_matrix[row, column] != "-":
+    if backtrack_matrix[row, column] == "D":
+        alignment1.insert(0, seq1[row-1])
+        alignment2.insert(0, seq2[column-1])
+        row -= 1
+        column -= 1
+    elif backtrack_matrix[row, column] == "U":
+        alignment1.insert(0, seq1[row-1])
+        alignment2.insert(0, "-")
+        row -= 1
+    else:
+        alignment1.insert(0, "-")
+        alignment2.insert(0, seq2[column-1])
+        column -= 1
 
+best_score = scoring_matrix[len(seq1), len(seq2)]
 
-# score = max(bases, base against gap, gap against base)
+best_alignment = ("".join(alignment1), "".join(alignment2))
 
 # -------------------------------------------------------------
 
 
 # DO NOT EDIT (unless you want to turn off displaying alignments for large sequences)------------------
 # This calculates the time taken and will print out useful information 
-# stop = time.time()
-# time_taken=stop-start
-#
-# # Print out the best
-# print('Time taken: '+str(time_taken))
-# print('Best (score '+str(best_score)+'):')
-# displayAlignment(best_alignment)
+stop = time.time()
+time_taken=stop-start
+
+# Print out the best
+print('Time taken: '+str(time_taken))
+print('Best (score '+str(best_score)+'):')
+displayAlignment(best_alignment)
 
 # -------------------------------------------------------------
