@@ -2,16 +2,16 @@
 import time
 import sys
 import numpy as np
+from enum import Enum
 
 
 # YOUR FUNCTIONS GO HERE -------------------------------------
 # 1. Populate the scoring matrix and the backtracking matrix
 
 # ------------------------------------------------------------
-
-
 # DO NOT EDIT ------------------------------------------------
 # Given an alignment, which is two strings, display it
+
 
 def displayAlignment(alignment):
     string1 = alignment[0]
@@ -32,13 +32,13 @@ def displayAlignment(alignment):
 
 # DO NOT EDIT ------------------------------------------------
 # This opens the files, loads the sequences and starts the timer
-# file1 = open(sys.argv[1], 'r')
-# seq1=file1.read()
-# file1.close()
-# file2 = open(sys.argv[2], 'r')
-# seq2=file2.read()
-# file2.close()
-# start = time.time()
+file1 = open(sys.argv[1], 'r')
+seq1=file1.read()
+file1.close()
+file2 = open(sys.argv[2], 'r')
+seq2=file2.read()
+file2.close()
+start = time.time()
 
 # -------------------------------------------------------------
 
@@ -58,27 +58,29 @@ def displayAlignment(alignment):
 # -2 for a gap.
 
 # (rows, columns)
-
-seq1 = "AATG"
-seq2 = "ACGT"
-
-start = time.time()
-
-
 scoring_matrix = np.zeros((len(seq1) + 1, len(seq2) + 1), dtype=int)  # remember to include the gaps
-backtrack_matrix = np.full((len(seq1) + 1, len(seq2) + 1), "-", dtype=str)
+backtrack_matrix = np.zeros((len(seq1) + 1, len(seq2) + 1), dtype=int)
+base_scores = {"A": 4, "C": 3, "G": 2, "T": 1}
+
+
+class Direction(Enum):
+    DIAGONAL = 1
+    UP = 2
+    LEFT = 3
+
 
 # these loops initialise the first row and column of the scoring + backtrack matrix when matching against gaps
 # i.e. the whole pattern of -2, -4, -6, etc.
+start_score = time.time()
 for i in range(1, len(seq2) + 1):
     scoring_matrix[0, i] = scoring_matrix[0, i-1] - 2
-    backtrack_matrix[0, i] = "L"
+    backtrack_matrix[0, i] = Direction.LEFT.value
 
 for j in range(1, len(seq1) + 1):
     scoring_matrix[j, 0] = scoring_matrix[j-1, 0] - 2
-    backtrack_matrix[j, 0] = "U"
+    backtrack_matrix[j, 0] = Direction.UP.value
 
-direction = ("D", "U", "L")
+# direction = ("D", "U", "L")
 
 # the actual process of filling in the scoring matrix
 # going row by row
@@ -89,20 +91,23 @@ for row in range(1, len(seq1) + 1):
             if seq1[row-1] != seq2[column-1]:
                 diagonal = scoring_matrix[row-1, column-1] - 3
             else:
-                if seq1[row-1] == "A":
-                    diagonal = scoring_matrix[row-1, column-1] + 4
-                elif seq1[row-1] == "C":
-                    diagonal = scoring_matrix[row-1, column-1] + 3
-                elif seq1[row-1] == "G":
-                    diagonal = scoring_matrix[row-1, column-1] + 2
-                else:
-                    diagonal = scoring_matrix[row-1, column-1] + 1
+                diagonal = scoring_matrix[row-1, column-1] + base_scores[seq1[row-1]]
+                # if seq1[row-1] == "A":
+                #     diagonal = scoring_matrix[row-1, column-1] + 4
+                # elif seq1[row-1] == "C":
+                #     diagonal = scoring_matrix[row-1, column-1] + 3
+                # elif seq1[row-1] == "G":
+                #     diagonal = scoring_matrix[row-1, column-1] + 2
+                # else:
+                #     diagonal = scoring_matrix[row-1, column-1] + 1
 
             up = scoring_matrix[row - 1, column] - 2
             left = scoring_matrix[row, column-1] - 2
             scores = (diagonal, up, left)
             scoring_matrix[row, column] = max(scores)
-            backtrack_matrix[row, column] = direction[scores.index(max(scores))]
+            backtrack_matrix[row, column] = Direction(scores.index(max(scores)) + 1).value
+
+stop_score = time.time()
 
 # need to find the optimal alignment now
 # start in bottom right of backtracking matrix and follow the directions
@@ -115,13 +120,15 @@ column = len(seq2)
 alignment1 = []
 alignment2 = []
 
-while backtrack_matrix[row, column] != "-":
-    if backtrack_matrix[row, column] == "D":
+start_backtrack = time.time()
+
+while backtrack_matrix[row, column] != 0:
+    if backtrack_matrix[row, column] == Direction.DIAGONAL.value:
         alignment1.insert(0, seq1[row-1])
         alignment2.insert(0, seq2[column-1])
         row -= 1
         column -= 1
-    elif backtrack_matrix[row, column] == "U":
+    elif backtrack_matrix[row, column] == Direction.UP.value:
         alignment1.insert(0, seq1[row-1])
         alignment2.insert(0, "-")
         row -= 1
@@ -134,6 +141,8 @@ best_score = scoring_matrix[len(seq1), len(seq2)]
 
 best_alignment = ("".join(alignment1), "".join(alignment2))
 
+stop_backtrack = time.time()
+
 # -------------------------------------------------------------
 
 
@@ -141,10 +150,15 @@ best_alignment = ("".join(alignment1), "".join(alignment2))
 # This calculates the time taken and will print out useful information 
 stop = time.time()
 time_taken=stop-start
+time_taken_score = stop_score - start_score
+time_taken_backtrack = stop_backtrack - start_backtrack
+
+print("Time taken to score: "+str(time_taken_score))
+print("Time taken to backtrack: "+str(time_taken_backtrack))
 
 # Print out the best
 print('Time taken: '+str(time_taken))
 print('Best (score '+str(best_score)+'):')
-displayAlignment(best_alignment)
+# displayAlignment(best_alignment)
 
 # -------------------------------------------------------------
