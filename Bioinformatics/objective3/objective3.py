@@ -2,6 +2,7 @@ import time
 import numpy as np
 from matplotlib import pyplot as plt
 import networkx as nx
+from networkx.drawing.nx_agraph import write_dot, graphviz_layout
 
 # ignore first row
 # ignore first item in every row afterwards
@@ -87,7 +88,14 @@ def WPGMA(file_name):
 	graph.add_edge(matrix[0][1], matrix[0][1]+matrix[0][2])
 	graph.add_edge(matrix[0][2], matrix[0][1]+matrix[0][2])
 
-	nx.draw(graph, with_labels=True)
+	write_dot(graph, 'test.dot')
+
+	# same layout using matplotlib with no labels
+	pos = graphviz_layout(graph, prog='dot')
+	nx.draw(graph, pos, with_labels=True)
+	# plt.savefig('nx_test.png')
+
+	# plt.savefig("graph.png")
 	plt.show()
 
 	return
