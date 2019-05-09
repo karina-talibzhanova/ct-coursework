@@ -1,6 +1,6 @@
 import time
 import numpy as np
-import matplotlib as plt
+from matplotlib import pyplot as plt
 import networkx as nx
 
 # ignore first row
@@ -34,6 +34,9 @@ def WPGMA(file_name):
 	matrix = np.genfromtxt(file_name, dtype=None, encoding="utf-8")  # this is an ndarray
 	print(matrix)
 
+	graph = nx.Graph()  # use nx.draw() for drawing the graph i guess lol
+	pos = {}
+
 	while len(matrix) > 3:
 		# find the minimum val in the matrix
 		# reduce the matrix by squishing the row and column together and recalculating distances
@@ -46,6 +49,9 @@ def WPGMA(file_name):
 
 		# position[0] --> first (x,y) coords --> x = position[0][0], y = position[0][1]
 		header = matrix[0][position[0][0]] + matrix[0][position[0][1]]
+
+		graph.add_edge(matrix[0][position[0][0]], header)
+		graph.add_edge(matrix[0][position[0][1]], header)
 
 		array = []
 		for i in range(len(matrix)-1):
@@ -77,6 +83,12 @@ def WPGMA(file_name):
 		matrix[0][len(matrix)-1] = header
 
 		print(matrix)
+
+	graph.add_edge(matrix[0][1], matrix[0][1]+matrix[0][2])
+	graph.add_edge(matrix[0][2], matrix[0][1]+matrix[0][2])
+
+	nx.draw(graph, with_labels=True)
+	plt.show()
 
 	return
 
